@@ -556,3 +556,14 @@ dialog::backdrop { background: rgba(23, 63, 53, 0.45); }
   cursor: pointer;
 }
 .aviso button:empty { display: none; }
+
+
+/* ----- 10. Logo en el encabezado ----- */
+.marca-fila { display: flex; align-items: center; gap: 12px; }
+.logo {
+  flex: none;
+  width: 52px; height: 52px;
+  border-radius: 15px;
+  box-shadow: 0 6px 16px -6px rgba(23, 63, 53, 0.5);
+}
+.encabezado .saludo { margin-top: 8px; }
