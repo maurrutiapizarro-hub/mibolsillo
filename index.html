@@ -37,26 +37,30 @@
       <!-- Tarjeta verde con el balance -->
       <div class="tarjeta-saldo">
         <div class="saldo-arriba">
-          <p class="etiqueta-saldo">Balance disponible</p>
-          <button class="chip-moneda" id="boton-moneda" type="button" aria-label="Cambiar moneda">
-            <span id="codigo-moneda">CLP</span> <span aria-hidden="true">▾</span>
-          </button>
+          <p class="etiqueta-saldo">Disponible para gastar</p>
+          <button class="chip-moneda" id="codigo-moneda" type="button" aria-label="Cambiar moneda en Ajustes">CLP</button>
         </div>
         <p class="monto-saldo" id="balance">$0</p>
+        <p class="arrastre" id="arrastre"></p>
 
-        <button class="saldo-inicial" id="boton-saldo-inicial" type="button">
-          <span>Empezaste <span class="nombre-mes"></span> con <strong id="saldo-inicial">$0</strong></span>
-          <span class="saldo-inicial-accion">Cambiar</span>
+        <button class="boton-sueldo" id="boton-sueldo" type="button">
+          <span class="boton-sueldo-icono" aria-hidden="true">💼</span>
+          <span class="boton-sueldo-texto" id="texto-sueldo">Registrar sueldo</span>
+          <span class="boton-sueldo-accion" id="accion-sueldo">+</span>
         </button>
 
         <div class="resumen-mes">
           <div class="resumen-item">
-            <span class="resumen-etiqueta"><span class="punto punto-ingreso"></span>Entró este mes</span>
+            <span class="resumen-etiqueta">Entró</span>
             <span class="resumen-valor" id="ingresos-mes">$0</span>
           </div>
           <div class="resumen-item">
-            <span class="resumen-etiqueta"><span class="punto punto-gasto"></span>Salió este mes</span>
+            <span class="resumen-etiqueta">Gastaste</span>
             <span class="resumen-valor" id="gastos-mes">$0</span>
+          </div>
+          <div class="resumen-item">
+            <span class="resumen-etiqueta">Ahorraste</span>
+            <span class="resumen-valor" id="ahorro-mes">$0</span>
           </div>
         </div>
       </div>
@@ -69,7 +73,7 @@
         </div>
         <ul class="lista" id="lista"></ul>
         <div class="vacio" id="vacio">
-          <p>Aún no hay movimientos este mes. Toca el botón <strong>+</strong> de abajo para registrar uno.</p>
+          <p>Aún no hay movimientos este mes. Empieza registrando tu sueldo o toca el <strong>+</strong> de abajo.</p>
         </div>
       </div>
     </section>
@@ -78,50 +82,154 @@
     <!-- ================= PESTAÑA 2: MI PROGRESO ================= -->
     <section class="vista" id="vista-progreso" aria-label="Mi progreso" hidden>
 
-      <div class="selector-mes">
-        <button class="flecha" id="mes-anterior" type="button" aria-label="Mes anterior">‹</button>
-        <h2 id="titulo-mes-progreso">Octubre 2026</h2>
-        <button class="flecha" id="mes-siguiente" type="button" aria-label="Mes siguiente">›</button>
+      <div class="selector-tipo selector-modo" role="radiogroup" aria-label="Ver por">
+        <input type="radio" name="modo" id="modo-mes" value="mes" checked>
+        <label for="modo-mes">Mes</label>
+        <input type="radio" name="modo" id="modo-anio" value="anio">
+        <label for="modo-anio">Año</label>
+      </div>
+
+      <div class="selector-periodo">
+        <button class="flecha" id="periodo-anterior" type="button" aria-label="Anterior">‹</button>
+        <h2 id="titulo-periodo">Noviembre 2026</h2>
+        <button class="flecha" id="periodo-siguiente" type="button" aria-label="Siguiente">›</button>
       </div>
 
       <div class="cifras">
         <div class="cifra">
-          <span class="cifra-etiqueta"><span class="punto punto-ingreso"></span>Entró</span>
+          <span class="cifra-etiqueta">Entró</span>
           <span class="cifra-valor" id="progreso-ingresos">$0</span>
         </div>
         <div class="cifra">
-          <span class="cifra-etiqueta"><span class="punto punto-gasto"></span>Salió</span>
+          <span class="cifra-etiqueta">Gastaste</span>
           <span class="cifra-valor" id="progreso-gastos">$0</span>
         </div>
-        <div class="cifra cifra-destacada">
-          <span class="cifra-etiqueta">Te quedó</span>
+        <div class="cifra">
+          <span class="cifra-etiqueta">Ahorraste</span>
           <span class="cifra-valor" id="progreso-ahorro">$0</span>
         </div>
+        <div class="cifra cifra-destacada">
+          <span class="cifra-etiqueta">Te quedó libre</span>
+          <span class="cifra-valor" id="progreso-libre">$0</span>
+        </div>
+      </div>
+
+      <div class="bloque">
+        <h2>Cómo se repartió tu dinero</h2>
+        <p class="ayuda-bloque">Del total que entró, cuánto fue a cada cosa.</p>
+        <div class="reparto" id="reparto"></div>
+        <ul class="reparto-leyenda" id="reparto-leyenda"></ul>
+        <p class="vacio-texto" id="reparto-vacio">Registra un ingreso para ver cómo se reparte.</p>
+      </div>
+
+      <div class="bloque" id="bloque-anual" hidden>
+        <h2>Mes a mes</h2>
+        <div class="leyenda">
+          <span><span class="punto punto-ingreso"></span>Entró</span>
+          <span><span class="punto punto-gasto"></span>Gastaste</span>
+        </div>
+        <div class="grafico" id="grafico"></div>
+        <p class="detalle-grafico" id="detalle-grafico">Toca un mes para ver el detalle.</p>
       </div>
 
       <div class="bloque">
         <h2>¿En qué gastaste?</h2>
         <ul class="categorias" id="categorias"></ul>
-        <p class="vacio-texto" id="categorias-vacio">No registraste gastos este mes.</p>
+        <p class="vacio-texto" id="categorias-vacio">No hay gastos registrados en este periodo.</p>
       </div>
 
-      <div class="bloque">
-        <h2>Últimos 6 meses</h2>
-        <div class="leyenda">
-          <span><span class="punto punto-ingreso"></span>Entró</span>
-          <span><span class="punto punto-gasto"></span>Salió</span>
-        </div>
-        <div class="grafico" id="grafico"></div>
-        <p class="detalle-grafico" id="detalle-grafico">Toca un mes para ver los montos.</p>
-      </div>
-
-      <div class="bloque">
+      <div class="bloque" id="bloque-lista-mes">
         <div class="titulo-bloque">
-          <h2>Movimientos del mes</h2>
+          <h2>Movimientos</h2>
           <span class="contador" id="contador-progreso"></span>
         </div>
         <ul class="lista" id="lista-progreso"></ul>
         <p class="vacio-texto" id="vacio-progreso">No hay movimientos en este mes.</p>
+      </div>
+    </section>
+
+
+    <!-- ================= PESTAÑA 3: MI PLAN ================= -->
+    <section class="vista" id="vista-plan" aria-label="Mi plan" hidden>
+
+      <div class="tarjeta-ahorrado">
+        <p class="etiqueta-saldo">Llevas ahorrado</p>
+        <p class="monto-saldo" id="total-ahorrado">$0</p>
+        <p class="arrastre" id="ahorrado-anio"></p>
+      </div>
+
+      <div id="plan-sin-datos" class="bloque">
+        <h2>Tu plan aparecerá aquí</h2>
+        <p class="vacio-texto">
+          Registra tu sueldo y tus gastos durante el mes. Con esos datos, Mi Bolsillo calcula
+          cuánto te queda en promedio y cuánto podrías ir juntando.
+        </p>
+      </div>
+
+      <div id="plan-con-datos">
+        <div class="bloque">
+          <h2>Tu mes promedio</h2>
+          <p class="ayuda-bloque" id="plan-base"></p>
+          <ul class="promedios" id="promedios"></ul>
+        </div>
+
+        <div class="bloque">
+          <h2>Tu reparto vs. la referencia 50/30/20</h2>
+          <p class="ayuda-bloque">
+            Una referencia muy conocida propone destinar 50% a necesidades, 30% a gustos y 20% a ahorro.
+            No es una regla: sirve para comparar.
+          </p>
+          <ul class="comparacion" id="comparacion"></ul>
+        </div>
+
+        <div class="bloque">
+          <h2>Lo que muestran tus números</h2>
+          <ul class="propuestas" id="propuestas"></ul>
+        </div>
+
+        <div class="bloque">
+          <h2>Simula tu ahorro</h2>
+          <label class="etiqueta" for="simulador">Si apartas cada mes…</label>
+          <div class="campo-monto">
+            <span class="simbolo-moneda" aria-hidden="true">$</span>
+            <input id="simulador" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+          </div>
+          <div class="simulacion" id="simulacion"></div>
+        </div>
+      </div>
+
+      <p class="aviso-legal">
+        Estos cálculos se hacen solo con lo que registras en la app y son una guía para ordenarte.
+        No son asesoría financiera.
+      </p>
+    </section>
+
+
+    <!-- ================= PESTAÑA 4: AJUSTES ================= -->
+    <section class="vista" id="vista-ajustes" aria-label="Ajustes" hidden>
+      <h2 class="titulo-vista">Ajustes</h2>
+
+      <div class="bloque">
+        <label class="etiqueta etiqueta-primera" for="moneda">Moneda</label>
+        <select id="moneda"></select>
+        <p class="ayuda">Si cambias la moneda, los montos que ya registraste no se convierten.</p>
+      </div>
+
+      <div class="bloque">
+        <h2>Respaldo de tus datos</h2>
+        <p class="ayuda-bloque">
+          Tus datos se guardan solo en este dispositivo. Descarga un respaldo de vez en cuando
+          para no perderlos, o para pasarlos a otro teléfono o computador.
+        </p>
+        <button class="boton-principal" id="descargar-respaldo" type="button">Descargar respaldo</button>
+        <label class="boton-secundario boton-archivo" for="archivo-respaldo">Recuperar desde un respaldo</label>
+        <input class="oculto" id="archivo-respaldo" type="file" accept="application/json,.json">
+      </div>
+
+      <div class="bloque">
+        <h2>Empezar de cero</h2>
+        <p class="ayuda-bloque">Borra todos los movimientos de este dispositivo. Te recomendamos descargar un respaldo antes.</p>
+        <button class="boton-peligro" id="borrar-todo" type="button">Borrar todos mis datos</button>
       </div>
     </section>
 
@@ -134,10 +242,18 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
       Inicio
     </button>
-    <button class="boton-agregar" id="abrir-registro" type="button" aria-label="Registrar movimiento">+</button>
     <button class="pestana" type="button" data-vista="progreso">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/></svg>
-      Mi progreso
+      Progreso
+    </button>
+    <button class="boton-agregar" id="abrir-registro" type="button" aria-label="Registrar movimiento">+</button>
+    <button class="pestana" type="button" data-vista="plan">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2"/></svg>
+      Mi plan
+    </button>
+    <button class="pestana" type="button" data-vista="ajustes">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+      Ajustes
     </button>
   </nav>
 
@@ -150,12 +266,15 @@
         <button class="cerrar" id="cerrar-registro" type="button" aria-label="Cerrar">×</button>
       </div>
 
-      <div class="selector-tipo" role="radiogroup" aria-label="Tipo de movimiento">
+      <div class="selector-tipo selector-tres" role="radiogroup" aria-label="Tipo de movimiento">
         <input type="radio" name="tipo" id="tipo-gasto" value="gasto" checked>
         <label for="tipo-gasto">Gasto</label>
         <input type="radio" name="tipo" id="tipo-ingreso" value="ingreso">
         <label for="tipo-ingreso">Ingreso</label>
+        <input type="radio" name="tipo" id="tipo-ahorro" value="ahorro">
+        <label for="tipo-ahorro">Ahorro</label>
       </div>
+      <p class="ayuda" id="ayuda-tipo"></p>
 
       <label class="etiqueta" for="monto">¿Cuánto?</label>
       <div class="campo-monto">
@@ -163,7 +282,7 @@
         <input id="monto" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
       </div>
 
-      <label class="etiqueta" for="descripcion">¿En qué?</label>
+      <label class="etiqueta" for="descripcion">Descripción</label>
       <input id="descripcion" type="text" maxlength="60" autocomplete="off" placeholder="Ejemplo: Supermercado">
 
       <span class="etiqueta" id="titulo-categoria">Categoría</span>
@@ -174,35 +293,7 @@
 
       <p class="error" id="error" role="alert"></p>
 
-      <button class="boton-principal" type="submit">Guardar movimiento</button>
-    </form>
-  </dialog>
-
-
-  <!-- ===== Ventana de moneda y saldo inicial ===== -->
-  <dialog class="ventana" id="ventana-ajustes" aria-labelledby="titulo-ajustes">
-    <form id="formulario-ajustes" method="dialog" novalidate>
-      <h2 id="titulo-ajustes">Tu mes</h2>
-
-      <label class="etiqueta" for="moneda">Moneda</label>
-      <select id="moneda"></select>
-      <p class="ayuda">Si cambias la moneda, los montos que ya registraste no se convierten.</p>
-
-      <label class="etiqueta" for="saldo-inicial-campo">
-        ¿Con cuánto empezaste <span class="nombre-mes"></span>?
-      </label>
-      <div class="campo-monto">
-        <span class="simbolo-moneda" aria-hidden="true">$</span>
-        <input id="saldo-inicial-campo" type="text" inputmode="decimal" autocomplete="off" placeholder="Automático">
-      </div>
-      <p class="ayuda">
-        Si lo dejas vacío, se usa lo que te quedó el mes anterior.
-      </p>
-
-      <div class="botones-ventana">
-        <button class="boton-secundario" id="cancelar-ajustes" type="button">Cancelar</button>
-        <button class="boton-principal" type="submit">Guardar</button>
-      </div>
+      <button class="boton-principal" type="submit">Guardar</button>
     </form>
   </dialog>
 
