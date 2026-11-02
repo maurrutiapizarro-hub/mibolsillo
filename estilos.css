@@ -20,6 +20,15 @@
   --rojo-suave: #f5e3df;
   --coral: #f2a594;          /* gastos sobre la tarjeta oscura */
 
+  --dorado: #eda100;         /* ahorro */
+  --dorado-texto: #8a5f00;
+  --dorado-suave: #fbefcf;
+
+  /* Colores del reparto (validados para daltonismo) */
+  --color-necesidades: #2a78d6;
+  --color-gustos: #d55181;
+  --color-ahorro: #eda100;
+
   --letra-titulos: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --letra-texto: "Figtree", -apple-system, "Segoe UI", system-ui, sans-serif;
 
@@ -77,7 +86,7 @@ button { font: inherit; color: inherit; }
   color: #ffffff;
   box-shadow: 0 18px 40px -18px rgba(23, 63, 53, 0.6);
 }
-.saldo-arriba { display: flex; align-items: center; justify-content: space-between; }
+.saldo-arriba { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .etiqueta-saldo { margin: 0; font-size: 15px; opacity: 0.8; }
 
 .chip-moneda {
@@ -90,10 +99,9 @@ button { font: inherit; color: inherit; }
   letter-spacing: 0.02em;
   cursor: pointer;
 }
-.chip-moneda:hover { background: rgba(255, 255, 255, 0.16); }
 
 .monto-saldo {
-  margin: 6px 0 14px;
+  margin: 6px 0 2px;
   font-family: var(--letra-titulos);
   font-size: 46px;
   font-weight: 700;
@@ -104,39 +112,55 @@ button { font: inherit; color: inherit; }
 }
 .monto-saldo.negativo { color: var(--coral); }
 
-.saldo-inicial {
+.arrastre { min-height: 20px; margin: 0 0 14px; font-size: 14px; opacity: 0.75; }
+
+.boton-sueldo {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   padding: 11px 14px;
-  border: none;
+  border: 1px dashed rgba(255, 255, 255, 0.35);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.08);
-  font-size: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 15px;
   text-align: left;
   cursor: pointer;
 }
-.saldo-inicial:hover { background: rgba(255, 255, 255, 0.13); }
-.saldo-inicial strong { white-space: nowrap; }
-.saldo-inicial-accion { flex: none; color: var(--menta); font-weight: 700; }
+.boton-sueldo:hover { background: rgba(255, 255, 255, 0.12); }
+.boton-sueldo.listo { border-style: solid; border-color: transparent; background: rgba(255, 255, 255, 0.08); }
+.boton-sueldo-icono { font-size: 18px; }
+.boton-sueldo-texto { flex: 1; }
+.boton-sueldo-accion {
+  display: grid;
+  place-items: center;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--menta);
+  color: var(--verde-oscuro);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+.boton-sueldo.listo .boton-sueldo-accion { background: transparent; color: var(--menta); font-size: 16px; }
 
 .resumen-mes {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   margin-top: 16px;
   padding-top: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
-.resumen-item + .resumen-item { padding-left: 16px; border-left: 1px solid rgba(255, 255, 255, 0.14); }
+.resumen-item + .resumen-item { padding-left: 12px; border-left: 1px solid rgba(255, 255, 255, 0.14); }
+.resumen-item { min-width: 0; }
 .resumen-etiqueta { display: block; font-size: 13px; opacity: 0.75; }
-.tarjeta-saldo .punto-ingreso { background: var(--menta); }
-.tarjeta-saldo .punto-gasto { background: var(--coral); }
 .resumen-valor {
   display: block;
   margin-top: 2px;
-  font-size: 19px;
+  overflow: hidden;
+  font-size: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -152,6 +176,8 @@ button { font: inherit; color: inherit; }
 .bloque > h2 { margin-bottom: 14px; }
 .titulo-bloque { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
 .contador { color: var(--gris); font-size: 14px; }
+.ayuda-bloque { margin: -8px 0 16px; color: var(--gris); font-size: 14px; }
+.titulo-vista { margin: 0 4px 4px; font-size: 26px; }
 
 /* Lista de movimientos */
 .lista { margin: 0; padding: 0; list-style: none; }
@@ -181,6 +207,7 @@ button { font: inherit; color: inherit; }
 }
 .icono.gasto   { background: var(--rojo-suave); }
 .icono.ingreso { background: var(--verde-claro); }
+.icono.ahorro  { background: var(--dorado-suave); }
 
 .info { flex: 1; min-width: 0; }
 .info strong {
@@ -190,11 +217,12 @@ button { font: inherit; color: inherit; }
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-.detalle { color: var(--gris); font-size: 14px; }
+.detalle { display: block; overflow: hidden; color: var(--gris); font-size: 14px; white-space: nowrap; text-overflow: ellipsis; }
 
 .importe { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .importe.gasto   { color: var(--rojo); }
 .importe.ingreso { color: var(--verde); }
+.importe.ahorro  { color: var(--dorado-texto); }
 
 .boton-eliminar {
   flex: none;
@@ -213,13 +241,14 @@ button { font: inherit; color: inherit; }
 
 
 /* ----- 5. Mi progreso ----- */
-.selector-mes {
+.selector-modo { margin-bottom: 14px; }
+.selector-periodo {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
-.selector-mes h2 { font-size: 24px; text-transform: capitalize; }
+.selector-periodo h2 { font-size: 24px; }
 .flecha {
   width: 44px; height: 44px;
   border: 1px solid var(--borde);
@@ -243,7 +272,6 @@ button { font: inherit; color: inherit; }
   background: var(--superficie);
 }
 .cifra-destacada {
-  grid-column: 1 / -1;
   background: var(--verde-oscuro);
   color: #ffffff;
 }
@@ -257,7 +285,7 @@ button { font: inherit; color: inherit; }
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
-.cifra-destacada .cifra-valor { font-size: 30px; }
+.cifra:nth-child(3) .cifra-valor { color: var(--dorado-texto); }
 .cifra-destacada .cifra-valor.negativo { color: var(--coral); }
 
 /* Barras por categoría */
@@ -265,7 +293,7 @@ button { font: inherit; color: inherit; }
 .categoria + .categoria { margin-top: 16px; }
 .categoria-arriba { display: flex; align-items: center; gap: 10px; }
 .categoria-icono { font-size: 18px; }
-.categoria-nombre { flex: 1; font-weight: 600; }
+.categoria-nombre { flex: 1; min-width: 0; font-weight: 600; line-height: 1.25; }
 .categoria-monto { font-weight: 700; font-variant-numeric: tabular-nums; }
 .categoria-porcentaje { width: 44px; color: var(--gris); font-size: 14px; text-align: right; }
 .categoria-barra {
@@ -275,14 +303,37 @@ button { font: inherit; color: inherit; }
   background: #e3ebe6;
   overflow: hidden;
 }
-.categoria-barra span { display: block; height: 100%; border-radius: 4px; background: var(--rojo); }
+.categoria-barra span { display: block; height: 100%; border-radius: 4px; background: var(--color-necesidades); }
+.categoria-barra span.gustos { background: var(--color-gustos); }
+.categoria-grupo { display: block; color: var(--gris); font-size: 13px; font-weight: 400; line-height: 1.2; }
 
-/* Gráfico de 6 meses */
+/* Reparto: una barra dividida en partes */
+.reparto {
+  display: flex;
+  gap: 2px;
+  height: 22px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #e3ebe6;
+}
+.reparto span { height: 100%; }
+.reparto .necesidades { background: var(--color-necesidades); }
+.reparto .gustos { background: var(--color-gustos); }
+.reparto .ahorro { background: var(--color-ahorro); }
+.reparto .libre { background: #d3dfd7; }
+.reparto-leyenda { margin: 14px 0 0; padding: 0; list-style: none; }
+.reparto-leyenda li { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+.reparto-leyenda .cuadro { flex: none; width: 12px; height: 12px; border-radius: 4px; }
+.reparto-leyenda .nombre { flex: 1; }
+.reparto-leyenda .valor { font-weight: 700; font-variant-numeric: tabular-nums; }
+.reparto-leyenda .porcentaje { width: 44px; color: var(--gris); font-size: 14px; text-align: right; }
+
+/* Gráfico de 12 meses */
 .leyenda { display: flex; gap: 18px; margin: -4px 0 12px; color: var(--gris); font-size: 14px; }
 .grafico {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2px;
   height: 170px;
   align-items: end;
 }
@@ -293,7 +344,7 @@ button { font: inherit; color: inherit; }
   height: 100%;
   padding: 0;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   background: transparent;
   cursor: pointer;
 }
@@ -302,18 +353,74 @@ button { font: inherit; color: inherit; }
   display: flex;
   flex: 1;
   align-items: flex-end;
-  gap: 2px;
+  gap: 1px;
   width: 100%;
-  padding: 6px 6px 0;
+  padding: 6px 2px 0;
   border-bottom: 1px solid var(--borde);
 }
-.grafico-barra { flex: 1; min-height: 2px; border-radius: 4px 4px 0 0; }
+.grafico-barra { flex: 1; min-height: 2px; border-radius: 3px 3px 0 0; }
 .grafico-barra.ingreso { background: var(--verde); }
 .grafico-barra.gasto { background: var(--rojo); }
-.grafico-etiqueta { padding: 6px 0 4px; color: var(--gris); font-size: 13px; text-transform: capitalize; }
+.grafico-etiqueta { padding: 6px 0 4px; color: var(--gris); font-size: 11px; text-transform: capitalize; }
 .grafico-mes.elegido .grafico-etiqueta { color: var(--texto); font-weight: 700; }
 .detalle-grafico { min-height: 22px; margin: 12px 0 0; color: var(--gris); font-size: 14px; }
 .detalle-grafico strong { color: var(--texto); }
+.ver-mes {
+  margin-left: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--verde);
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
+/* ----- 5b. Mi plan ----- */
+.tarjeta-ahorrado {
+  padding: 22px;
+  border-radius: 28px;
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(237, 161, 0, 0.22), transparent 55%),
+    var(--verde-oscuro);
+  color: #ffffff;
+}
+.tarjeta-ahorrado .arrastre { margin: 0; }
+
+.promedios, .comparacion, .propuestas { margin: 0; padding: 0; list-style: none; }
+.promedios li { display: flex; justify-content: space-between; gap: 10px; padding: 9px 0; }
+.promedios li + li { border-top: 1px solid #e3ebe6; }
+.promedios .valor { font-weight: 700; font-variant-numeric: tabular-nums; }
+.promedios .destacado { font-family: var(--letra-titulos); font-size: 18px; }
+
+.comparacion li + li { margin-top: 16px; }
+.comparacion-arriba { display: flex; align-items: baseline; gap: 8px; }
+.comparacion-nombre { flex: 1; font-weight: 600; }
+.comparacion-tuyo { font-weight: 700; font-variant-numeric: tabular-nums; }
+.comparacion-ref { color: var(--gris); font-size: 14px; }
+.comparacion-barra { position: relative; height: 10px; margin-top: 7px; border-radius: 5px; background: #e3ebe6; }
+.comparacion-barra .relleno { position: absolute; inset: 0 auto 0 0; border-radius: 5px; }
+.comparacion-barra .marca-ref { position: absolute; top: -4px; bottom: -4px; width: 2px; border-radius: 1px; background: var(--texto); }
+
+.propuestas li {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: #ffffff;
+  line-height: 1.5;
+}
+.propuestas li + li { margin-top: 10px; }
+.propuesta-icono { flex: none; font-size: 22px; line-height: 1.2; }
+.propuestas strong { font-variant-numeric: tabular-nums; }
+
+.simulacion { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+.simulacion div { padding: 12px; border-radius: 14px; background: var(--dorado-suave); text-align: center; }
+.simulacion span { display: block; color: var(--dorado-texto); font-size: 13px; }
+.simulacion strong { display: block; font-family: var(--letra-titulos); font-size: 17px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+.aviso-legal { margin: 22px 8px 0; color: var(--gris); font-size: 13px; text-align: center; }
 
 
 /* ----- 6. Barra inferior ----- */
@@ -323,11 +430,11 @@ button { font: inherit; color: inherit; }
   bottom: calc(12px + env(safe-area-inset-bottom));
   z-index: 10;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr 1fr auto 1fr 1fr;
   align-items: center;
-  width: min(440px, calc(100% - 28px));
+  width: min(460px, calc(100% - 20px));
   height: var(--altura-barra);
-  padding: 0 10px;
+  padding: 0 6px;
   border-radius: 26px;
   background: rgba(247, 250, 247, 0.92);
   box-shadow: 0 10px 30px -10px rgba(23, 63, 53, 0.35);
@@ -344,7 +451,7 @@ button { font: inherit; color: inherit; }
   border: none;
   background: none;
   color: var(--gris);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -353,8 +460,8 @@ button { font: inherit; color: inherit; }
 .pestana.activa svg { fill: var(--verde-claro); }
 
 .boton-agregar {
-  width: 62px; height: 62px;
-  margin-top: -30px;
+  width: 60px; height: 60px;
+  margin: -30px 4px 0;
   border: 5px solid var(--fondo);
   border-radius: 50%;
   background: var(--verde);
@@ -389,6 +496,10 @@ button { font: inherit; color: inherit; }
 }
 #tipo-gasto:checked + label   { background: #ffffff; color: var(--rojo); }
 #tipo-ingreso:checked + label { background: #ffffff; color: var(--verde); }
+#tipo-ahorro:checked + label  { background: #ffffff; color: var(--dorado-texto); }
+.selector-tres { grid-template-columns: repeat(3, 1fr); }
+.selector-modo input:checked + label { background: #ffffff; color: var(--verde-oscuro); }
+#ayuda-tipo { min-height: 20px; }
 
 .etiqueta {
   display: block;
@@ -443,6 +554,8 @@ input:focus, select:focus {
 
 /* Categorías como botones */
 .opciones-categoria { display: flex; flex-wrap: wrap; gap: 8px; }
+.grupo-categoria { width: 100%; margin-top: 4px; color: var(--gris); font-size: 13px; font-weight: 600; }
+.grupo-categoria:first-child { margin-top: 0; }
 .opcion-categoria input { position: absolute; opacity: 0; pointer-events: none; }
 .opcion-categoria span {
   display: inline-flex;
@@ -472,6 +585,20 @@ input:focus, select:focus {
 .boton-principal { margin-top: 4px; border: none; background: var(--verde); color: #ffffff; }
 .boton-principal:hover { background: #1f6a52; }
 .boton-secundario { border: 1.5px solid var(--borde); background: #ffffff; }
+.boton-archivo { display: block; margin-top: 10px; text-align: center; }
+.boton-peligro {
+  width: 100%;
+  padding: 14px;
+  border: 1.5px solid #e6c4bd;
+  border-radius: 16px;
+  background: #ffffff;
+  color: var(--rojo);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.etiqueta-primera { margin-top: 0; }
+.oculto { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 
 :focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }
 
@@ -484,15 +611,6 @@ dialog {
   color: var(--texto);
 }
 dialog::backdrop { background: rgba(23, 63, 53, 0.45); }
-
-/* Ventana centrada (moneda y saldo inicial) */
-.ventana {
-  width: min(420px, calc(100% - 32px));
-  border-radius: 26px;
-}
-.ventana h2 { font-size: 24px; }
-.botones-ventana { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 24px; }
-.botones-ventana .boton-principal { margin-top: 0; }
 
 /* Hoja que sube desde abajo (nuevo movimiento) */
 .hoja {
