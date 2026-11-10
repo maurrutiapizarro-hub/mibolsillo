@@ -26,6 +26,9 @@
       <div class="marca-fila">
         <img class="logo" src="icono.png" alt="" width="52" height="52">
         <h1 class="marca">Mi Bolsillo</h1>
+        <button class="boton-ajustes" id="abrir-ajustes" type="button" aria-label="Ajustes">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+        </button>
       </div>
       <p class="saludo" id="saludo">Hola</p>
     </header>
@@ -63,6 +66,26 @@
             <span class="resumen-valor" id="ahorro-mes">$0</span>
           </div>
         </div>
+      </div>
+
+      <!-- Resumen de deudas (solo aparece si registraste deudas) -->
+      <button class="fila-deudas" id="fila-deudas" type="button" hidden>
+        <span class="fila-deudas-icono" aria-hidden="true">💳</span>
+        <span class="fila-deudas-texto">
+          <strong id="fila-deudas-total">$0 por pagar</strong>
+          <span id="fila-deudas-foco"></span>
+        </span>
+        <span class="fila-deudas-flecha" aria-hidden="true">›</span>
+      </button>
+
+      <!-- Presupuesto del mes según el plan elegido -->
+      <div class="bloque" id="bloque-presupuesto" hidden>
+        <div class="titulo-bloque">
+          <h2>Presupuesto del mes</h2>
+          <button class="boton-chico" id="cambiar-plan" type="button">Plan <span id="nombre-plan-chico">50/30/20</span></button>
+        </div>
+        <p class="ayuda-bloque" id="base-presupuesto"></p>
+        <ul class="presupuesto" id="presupuesto"></ul>
       </div>
 
       <!-- Lista de movimientos -->
@@ -104,9 +127,13 @@
           <span class="cifra-etiqueta">Gastaste</span>
           <span class="cifra-valor" id="progreso-gastos">$0</span>
         </div>
-        <div class="cifra">
+        <div class="cifra cifra-ahorro">
           <span class="cifra-etiqueta">Ahorraste</span>
           <span class="cifra-valor" id="progreso-ahorro">$0</span>
+        </div>
+        <div class="cifra cifra-deuda">
+          <span class="cifra-etiqueta">Pagaste en deudas</span>
+          <span class="cifra-valor" id="progreso-deudas">$0</span>
         </div>
         <div class="cifra cifra-destacada">
           <span class="cifra-etiqueta">Te quedó libre</span>
@@ -149,52 +176,156 @@
     </section>
 
 
-    <!-- ================= PESTAÑA 3: MI PLAN ================= -->
-    <section class="vista" id="vista-plan" aria-label="Mi plan" hidden>
+    <!-- ================= PESTAÑA 3: AHORRO ================= -->
+    <section class="vista" id="vista-ahorro" aria-label="Ahorro" hidden>
 
       <div class="tarjeta-ahorrado">
         <p class="etiqueta-saldo">Llevas ahorrado</p>
         <p class="monto-saldo" id="total-ahorrado">$0</p>
-        <p class="arrastre" id="ahorrado-anio"></p>
+        <p class="arrastre" id="ahorrado-mes"></p>
+        <p class="deuda-libre" id="ahorro-sugerido"></p>
+      </div>
+
+      <div class="bloque">
+        <div class="titulo-bloque">
+          <h2>Tus metas</h2>
+          <button class="boton-chico" id="agregar-meta" type="button">+ Nueva meta</button>
+        </div>
+        <ul class="lista-deudas" id="lista-metas"></ul>
+      </div>
+
+      <div class="bloque">
+        <h2>Simula tu ahorro</h2>
+        <label class="etiqueta etiqueta-primera" for="simulador">Si apartas cada mes…</label>
+        <div class="campo-monto">
+          <span class="simbolo-moneda" aria-hidden="true">$</span>
+          <input id="simulador" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+        </div>
+        <div class="simulacion" id="simulacion"></div>
+
+        <label class="etiqueta" for="simulador-meta">¿Cuánto quieres juntar? <span class="opcional">(opcional)</span></label>
+        <div class="campo-monto">
+          <span class="simbolo-moneda" aria-hidden="true">$</span>
+          <input id="simulador-meta" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+        </div>
+        <p class="ayuda" id="simulacion-meta"></p>
+      </div>
+    </section>
+
+
+    <!-- ================= PESTAÑA 4: DEUDAS ================= -->
+    <section class="vista" id="vista-deudas" aria-label="Deudas" hidden>
+
+      <div class="tarjeta-deuda">
+        <p class="etiqueta-saldo">Te queda por pagar</p>
+        <p class="monto-saldo" id="deuda-total">$0</p>
+        <div class="barra-avance" aria-hidden="true"><span id="deuda-avance-barra"></span></div>
+        <p class="arrastre" id="deuda-avance-texto"></p>
+        <p class="deuda-libre" id="deuda-libre"></p>
+      </div>
+
+      <div class="bloque" id="bloque-plan-deudas">
+        <h2>Tu plan de pago</h2>
+        <div class="selector-tipo selector-metodo" role="radiogroup" aria-label="Orden de pago">
+          <input type="radio" name="metodo" id="metodo-bola" value="bola" checked>
+          <label for="metodo-bola">Bola de nieve</label>
+          <input type="radio" name="metodo" id="metodo-avalancha" value="avalancha">
+          <label for="metodo-avalancha">Avalancha</label>
+        </div>
+        <p class="ayuda" id="ayuda-metodo"></p>
+
+        <label class="etiqueta" for="presupuesto-deudas">¿Cuánto puedes destinar a deudas cada mes?</label>
+        <div class="campo-monto">
+          <span class="simbolo-moneda" aria-hidden="true">$</span>
+          <input id="presupuesto-deudas" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+        </div>
+        <p class="ayuda" id="ayuda-presupuesto"></p>
+        <button class="boton-texto" id="usar-plan-deudas" type="button" hidden></button>
+        <div class="resultado-plan" id="resultado-plan"></div>
+      </div>
+
+      <div class="bloque">
+        <div class="titulo-bloque">
+          <h2>Tus deudas</h2>
+          <button class="boton-chico" id="agregar-deuda" type="button">+ Agregar</button>
+        </div>
+        <ul class="lista-deudas" id="lista-deudas"></ul>
+        <div class="vacio" id="deudas-vacio">
+          <p>
+            Registra tus deudas para ver cuánto te queda, en qué orden pagarlas y cuándo podrías quedar libre.
+            Toca <strong>+ Agregar</strong>, o carga un archivo de deudas desde <strong>Ajustes</strong>.
+          </p>
+        </div>
+      </div>
+
+      <p class="aviso-legal">
+        Las fechas son estimaciones hechas con los datos que ingresas. Pregunta a cada institución
+        por tu saldo real, tu tasa y si cobran comisión por pagar antes.
+      </p>
+    </section>
+
+
+    <!-- ================= PESTAÑA 5: MI PLAN ================= -->
+    <section class="vista" id="vista-plan" aria-label="Mi plan" hidden>
+      <h2 class="titulo-vista">Mi plan</h2>
+
+      <div class="bloque">
+        <h2>Elige cómo repartir tu dinero</h2>
+        <p class="ayuda-bloque">El plan que elijas arma tu presupuesto del mes y los montos sugeridos para ahorro y deudas. Puedes cambiarlo cuando quieras.</p>
+        <div class="planes" id="planes" role="radiogroup" aria-label="Plan"></div>
+
+        <div class="plan-personal" id="plan-personal" hidden>
+          <p class="etiqueta etiqueta-primera">Tus porcentajes</p>
+          <div class="porcentajes">
+            <label><span>Necesidades</span><input id="pct-necesidades" type="text" inputmode="numeric" maxlength="3"><span>%</span></label>
+            <label><span>Gustos</span><input id="pct-gustos" type="text" inputmode="numeric" maxlength="3"><span>%</span></label>
+            <label><span>Deudas</span><input id="pct-deudas" type="text" inputmode="numeric" maxlength="3"><span>%</span></label>
+            <label><span>Ahorro</span><input id="pct-ahorro" type="text" inputmode="numeric" maxlength="3"><span>%</span></label>
+          </div>
+          <p class="ayuda" id="suma-porcentajes"></p>
+        </div>
+      </div>
+
+      <div class="bloque">
+        <h2>Tu camino</h2>
+        <p class="ayuda-bloque">Tres pasos, uno detrás del otro, inspirados en el método de Dave Ramsey.</p>
+        <ol class="pasos" id="pasos"></ol>
+      </div>
+
+      <div class="bloque">
+        <h2>Tu evolución</h2>
+        <p class="ayuda-bloque">Cómo baja tu deuda y sube tu ahorro, mes a mes.</p>
+        <div class="leyenda">
+          <span><span class="punto punto-deuda"></span>Deuda restante</span>
+          <span><span class="punto punto-ahorro"></span>Ahorro acumulado</span>
+        </div>
+        <div class="grafico" id="grafico-evolucion"></div>
+        <p class="detalle-grafico" id="detalle-evolucion"></p>
       </div>
 
       <div id="plan-sin-datos" class="bloque">
-        <h2>Tu plan aparecerá aquí</h2>
+        <h2>Tus números aparecerán aquí</h2>
         <p class="vacio-texto">
-          Registra tu sueldo y tus gastos durante el mes. Con esos datos, Mi Bolsillo calcula
-          cuánto te queda en promedio y cuánto podrías ir juntando.
+          Registra tu sueldo y tus gastos durante el mes. Con esos datos, Mi Bolsillo compara tu reparto con tu plan
+          y te muestra cuánto podrías ahorrar o adelantar en deudas.
         </p>
       </div>
 
       <div id="plan-con-datos">
         <div class="bloque">
-          <h2>Tu mes promedio</h2>
+          <h2>Tu reparto vs. tu plan</h2>
           <p class="ayuda-bloque" id="plan-base"></p>
-          <ul class="promedios" id="promedios"></ul>
+          <ul class="comparacion" id="comparacion"></ul>
         </div>
 
         <div class="bloque">
-          <h2>Tu reparto vs. la referencia 50/30/20</h2>
-          <p class="ayuda-bloque">
-            Una referencia muy conocida propone destinar 50% a necesidades, 30% a gustos y 20% a ahorro.
-            No es una regla: sirve para comparar.
-          </p>
-          <ul class="comparacion" id="comparacion"></ul>
+          <h2>Tu mes promedio</h2>
+          <ul class="promedios" id="promedios"></ul>
         </div>
 
         <div class="bloque">
           <h2>Lo que muestran tus números</h2>
           <ul class="propuestas" id="propuestas"></ul>
-        </div>
-
-        <div class="bloque">
-          <h2>Simula tu ahorro</h2>
-          <label class="etiqueta" for="simulador">Si apartas cada mes…</label>
-          <div class="campo-monto">
-            <span class="simbolo-moneda" aria-hidden="true">$</span>
-            <input id="simulador" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
-          </div>
-          <div class="simulacion" id="simulacion"></div>
         </div>
       </div>
 
@@ -205,7 +336,7 @@
     </section>
 
 
-    <!-- ================= PESTAÑA 4: AJUSTES ================= -->
+    <!-- ================= AJUSTES (se abre con el botón de arriba) ================= -->
     <section class="vista" id="vista-ajustes" aria-label="Ajustes" hidden>
       <h2 class="titulo-vista">Ajustes</h2>
 
@@ -216,19 +347,29 @@
       </div>
 
       <div class="bloque">
+        <h2>Descargar en Excel</h2>
+        <p class="ayuda-bloque">
+          Un archivo con tus movimientos, el resumen mes a mes, tus deudas, tus metas de ahorro y tu plan.
+          Sirve para revisarlo en el computador o guardarlo.
+        </p>
+        <button class="boton-principal" id="descargar-excel" type="button">Descargar Excel</button>
+      </div>
+
+      <div class="bloque">
         <h2>Respaldo de tus datos</h2>
         <p class="ayuda-bloque">
           Tus datos se guardan solo en este dispositivo. Descarga un respaldo de vez en cuando
-          para no perderlos, o para pasarlos a otro teléfono o computador.
+          para no perderlos, o para pasarlos a otro teléfono o computador. Aquí también puedes
+          cargar un archivo de deudas.
         </p>
         <button class="boton-principal" id="descargar-respaldo" type="button">Descargar respaldo</button>
-        <label class="boton-secundario boton-archivo" for="archivo-respaldo">Recuperar desde un respaldo</label>
+        <label class="boton-secundario boton-archivo" for="archivo-respaldo">Recuperar o cargar un archivo</label>
         <input class="oculto" id="archivo-respaldo" type="file" accept="application/json,.json">
       </div>
 
       <div class="bloque">
         <h2>Empezar de cero</h2>
-        <p class="ayuda-bloque">Borra todos los movimientos de este dispositivo. Te recomendamos descargar un respaldo antes.</p>
+        <p class="ayuda-bloque">Borra todos los movimientos, deudas y metas de este dispositivo. Te recomendamos descargar un respaldo antes.</p>
         <button class="boton-peligro" id="borrar-todo" type="button">Borrar todos mis datos</button>
       </div>
     </section>
@@ -246,16 +387,22 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/></svg>
       Progreso
     </button>
-    <button class="boton-agregar" id="abrir-registro" type="button" aria-label="Registrar movimiento">+</button>
+    <button class="pestana" type="button" data-vista="ahorro">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5c-.5-.9-1.5-1.5-2.5-1.5-1.4 0-2.5.8-2.5 2s1.1 1.7 2.5 2 2.5.8 2.5 2-1.1 2-2.5 2c-1 0-2-.6-2.5-1.5M12 6.5V8M12 16v1.5"/></svg>
+      Ahorro
+    </button>
+    <button class="pestana" type="button" data-vista="deudas">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/></svg>
+      Deudas
+    </button>
     <button class="pestana" type="button" data-vista="plan">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h12l-2.5 4L17 12H5"/></svg>
       Mi plan
     </button>
-    <button class="pestana" type="button" data-vista="ajustes">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
-      Ajustes
-    </button>
   </nav>
+
+  <!-- Botón flotante para registrar -->
+  <button class="boton-agregar" id="abrir-registro" type="button" aria-label="Registrar movimiento">+</button>
 
 
   <!-- ===== Hoja para registrar un movimiento ===== -->
@@ -266,13 +413,15 @@
         <button class="cerrar" id="cerrar-registro" type="button" aria-label="Cerrar">×</button>
       </div>
 
-      <div class="selector-tipo selector-tres" role="radiogroup" aria-label="Tipo de movimiento">
+      <div class="selector-tipo selector-cuatro" role="radiogroup" aria-label="Tipo de movimiento">
         <input type="radio" name="tipo" id="tipo-gasto" value="gasto" checked>
         <label for="tipo-gasto">Gasto</label>
         <input type="radio" name="tipo" id="tipo-ingreso" value="ingreso">
         <label for="tipo-ingreso">Ingreso</label>
         <input type="radio" name="tipo" id="tipo-ahorro" value="ahorro">
         <label for="tipo-ahorro">Ahorro</label>
+        <input type="radio" name="tipo" id="tipo-deuda" value="deuda">
+        <label for="tipo-deuda">Deuda</label>
       </div>
       <p class="ayuda" id="ayuda-tipo"></p>
 
@@ -282,10 +431,11 @@
         <input id="monto" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
       </div>
 
-      <label class="etiqueta" for="descripcion">Descripción</label>
+      <label class="etiqueta" for="descripcion">Descripción <span class="opcional" id="descripcion-opcional" hidden>(opcional)</span></label>
       <input id="descripcion" type="text" maxlength="60" autocomplete="off" placeholder="Ejemplo: Supermercado">
 
       <span class="etiqueta" id="titulo-categoria">Categoría</span>
+      <p class="ayuda" id="sin-deudas" hidden>Primero agrega una deuda en la pestaña <strong>Deudas</strong>.</p>
       <div class="opciones-categoria" id="categoria" role="radiogroup" aria-labelledby="titulo-categoria"></div>
 
       <label class="etiqueta" for="fecha">Fecha</label>
@@ -294,6 +444,78 @@
       <p class="error" id="error" role="alert"></p>
 
       <button class="boton-principal" type="submit">Guardar</button>
+    </form>
+  </dialog>
+
+
+  <!-- ===== Hoja para agregar o editar una deuda ===== -->
+  <dialog class="hoja" id="ventana-deuda" aria-labelledby="titulo-deuda">
+    <form id="formulario-deuda" novalidate>
+      <div class="hoja-arriba">
+        <h2 id="titulo-deuda">Nueva deuda</h2>
+        <button class="cerrar" id="cerrar-deuda" type="button" aria-label="Cerrar">×</button>
+      </div>
+
+      <label class="etiqueta etiqueta-primera" for="deuda-nombre">¿Con quién es?</label>
+      <input id="deuda-nombre" type="text" maxlength="40" autocomplete="off" placeholder="Ejemplo: Tarjeta Banco de Chile">
+
+      <span class="etiqueta" id="titulo-tipo-deuda">Tipo</span>
+      <div class="opciones-categoria" id="deuda-tipo" role="radiogroup" aria-labelledby="titulo-tipo-deuda"></div>
+
+      <label class="etiqueta" for="deuda-saldo">¿Cuánto debes hoy?</label>
+      <div class="campo-monto">
+        <span class="simbolo-moneda" aria-hidden="true">$</span>
+        <input id="deuda-saldo" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+
+      <div class="fila">
+        <div>
+          <label class="etiqueta" for="deuda-cuota">Cuota mensual <span class="opcional">(opcional)</span></label>
+          <input id="deuda-cuota" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+        </div>
+        <div>
+          <label class="etiqueta" for="deuda-tasa">Interés mensual % <span class="opcional">(opcional)</span></label>
+          <input id="deuda-tasa" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej: 2,5">
+        </div>
+      </div>
+      <p class="ayuda">La cuota y el interés aparecen en tu estado de cuenta. Con ellos, la fecha estimada es más realista.</p>
+
+      <p class="error" id="error-deuda" role="alert"></p>
+
+      <button class="boton-principal" type="submit">Guardar deuda</button>
+      <button class="boton-peligro boton-eliminar-deuda" id="eliminar-deuda" type="button" hidden>Eliminar esta deuda</button>
+    </form>
+  </dialog>
+
+
+  <!-- ===== Hoja para crear o editar una meta de ahorro ===== -->
+  <dialog class="hoja" id="ventana-meta" aria-labelledby="titulo-meta">
+    <form id="formulario-meta" novalidate>
+      <div class="hoja-arriba">
+        <h2 id="titulo-meta">Nueva meta</h2>
+        <button class="cerrar" id="cerrar-meta" type="button" aria-label="Cerrar">×</button>
+      </div>
+
+      <label class="etiqueta etiqueta-primera" for="meta-nombre">¿Para qué estás ahorrando?</label>
+      <input id="meta-nombre" type="text" maxlength="40" autocomplete="off" placeholder="Ejemplo: Anillo de compromiso">
+
+      <span class="etiqueta" id="titulo-icono-meta">Ícono</span>
+      <div class="opciones-categoria" id="meta-icono" role="radiogroup" aria-labelledby="titulo-icono-meta"></div>
+
+      <label class="etiqueta" for="meta-objetivo">¿Cuánto necesitas juntar?</label>
+      <div class="campo-monto">
+        <span class="simbolo-moneda" aria-hidden="true">$</span>
+        <input id="meta-objetivo" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+
+      <label class="etiqueta" for="meta-aporte">¿Cuánto vas a apartar al mes? <span class="opcional">(opcional)</span></label>
+      <input id="meta-aporte" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+      <p class="ayuda">Con este monto calculamos en qué mes llegarías a tu meta.</p>
+
+      <p class="error" id="error-meta" role="alert"></p>
+
+      <button class="boton-principal" type="submit">Guardar meta</button>
+      <button class="boton-peligro boton-eliminar-deuda" id="eliminar-meta" type="button" hidden>Eliminar esta meta</button>
     </form>
   </dialog>
 
